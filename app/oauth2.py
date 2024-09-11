@@ -5,12 +5,12 @@ import time
 from fastapi import Depends, HTTPException, Request
 from app.config import settings
 import jwt
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.users.models.user import User
 
 # Authentication scheme
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = HTTPBearer()
 
 def generate_access_token(user_data):
     payload = { 
@@ -47,9 +47,10 @@ def decode_jwt(jwt_token, secret_key):
         print(f"Invalid token: {e}")
         return None
     
-async def get_current_user(request: Request, token: str = Depends(oauth2_scheme)):
+async def get_current_user(request: Request, token: HTTPAuthorizationCredentials = Depends(oauth2_scheme)):
     try:
-        payload = decode_jwt(token,settings.SECRET_KEY)
+        
+        payload = decode_jwt(token.credentials,settings.SECRET_KEY)
         user_id = payload.get("user_id")
         if user_id is None:
             raise HTTPException(status_code=400, detail="Could not validate token")

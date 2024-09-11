@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, Response,status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response,status
 from app import oauth2
 from app.auth.dtos.login_user import LoginUserDTO
 from app.auth.dtos.register_user import RegisterUserDTO
@@ -9,8 +9,8 @@ from app.config import settings
 router = APIRouter()
 
 @router.post("/register")
-async def register(payload:RegisterUserDTO):
-    return await authService.register_user(payload)
+async def register(payload:RegisterUserDTO, background_tasks: BackgroundTasks):
+    return await authService.register_user(payload,background_tasks)
      
 
 @router.post("/login")
