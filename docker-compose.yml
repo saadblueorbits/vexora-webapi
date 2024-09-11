@@ -13,6 +13,32 @@ services:
       - mongo:/data/db
     ports:
       - '6000:27017'
+  webapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:80"
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password123
+      - MONGO_INITDB_DATABASE=fastapi
+      - DATABASE_URL=mongodb://admin:password123@host.docker.internal:6000/fastapi?authSource=admin
+      - ACCESS_TOKEN_EXPIRES_IN=3600
+      - REFRESH_TOKEN_EXPIRES_IN=86400
+      - JWT_ALGORITHM=HS256
+      - CLIENT_ORIGIN=http://localhost:3000
+      - SECRET_KEY =secret
+      - SMTP_PROVIDER=gmail
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USER=martinjoey2j618@gmail.com
+      - SMTP_PASSWORD=rdiczfulcmdqcrhf
 
 volumes:
   mongo:

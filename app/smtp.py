@@ -7,6 +7,10 @@ from app.config import settings
 
 
 def send_email(to_email: str, subject: str, body: str):
+    print(settings.SMTP_USER)
+    print(settings.SMTP_HOST)
+    print(settings.SMTP_PORT)
+    print(settings.SMTP_PASSWORD)
     msg = MIMEMultipart()
     msg['From'] = settings.SMTP_USER
     msg['To'] = to_email
