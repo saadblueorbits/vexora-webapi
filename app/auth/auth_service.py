@@ -9,7 +9,7 @@ from app.users.models.user import User
 class AuthService:
 
 
-    async def register_user(self,register_user:RegisterUserDTO):
+    async def   register_user(self,register_user:RegisterUserDTO):
         existingUser = await Users.find_one({'email':register_user.email})
         if existingUser is not None:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT,detail="Account Already Exists")
@@ -35,3 +35,6 @@ class AuthService:
 
 
 authService = AuthService()
+
+
+
