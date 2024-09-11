@@ -1,6 +1,6 @@
 from datetime import datetime
-from fastapi import HTTPException,status
-from app import utils
+from fastapi import HTTPException,status,BackgroundTasks
+from app import smtp, utils
 from app.auth.dtos.login_user import LoginUserDTO
 from app.auth.dtos.register_user import RegisterUserDTO
 from app.database import Users
@@ -9,7 +9,7 @@ from app.users.models.user import User
 class AuthService:
 
 
-    async def register_user(self,register_user:RegisterUserDTO):
+    async def register_user(self,register_user:RegisterUserDTO, background_tasks: BackgroundTasks):
         existingUser = await Users.find_one({'email':register_user.email})
         if existingUser is not None:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT,detail="Account Already Exists")
@@ -20,6 +20,7 @@ class AuthService:
         userJSON['created_on'] = datetime.now()
         userJSON['modified_on'] = datetime.now()
         user = await Users.insert_one(userJSON)
+        background_tasks.add_task(smtp.send_email, register_user.email, 'Welcome', 'Welcome To Voxera')
         return {'userId':str(user.inserted_id)}
 
     async def login_user(self,login_user:LoginUserDTO):
