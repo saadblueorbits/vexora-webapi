@@ -11,3 +11,4 @@ app.include_router(router=users_controller.router, tags=['Users'], prefix='/api/
 @app.get("/api/healthchecker")
 def root():
     return {"message": "Welcome to FastAPI with MongoDB"}
+ 

@@ -16,15 +16,15 @@ from app.users.models.user import User
 oauth2_scheme = HTTPBearer()
 
 def generate_access_token(user_data):
-    payload = {
+    payload = { 
         'user_id': user_data['id'],
         'exp': time.time() + settings.ACCESS_TOKEN_EXPIRES_IN
     }
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
-
+ 
 def generate_refresh_token(user_data):
     payload = {
-        'user_id': user_data['id'],
+        'user_id': user_data['id'], 
         'exp': time.time() + settings.REFRESH_TOKEN_EXPIRES_IN
     }
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
