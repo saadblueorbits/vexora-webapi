@@ -1,9 +1,11 @@
 from datetime import datetime
 import random
+from bson import ObjectId
 from fastapi import HTTPException,status,BackgroundTasks
 from app import smtp, utils
 from app.auth.dtos.login_user import LoginUserDTO
 from app.auth.dtos.register_user import RegisterUserDTO
+from app.auth.dtos.verify_email import VerifyEmailDTO
 from app.database import Users
 from app.users.models.user import User
 import uuid
@@ -41,6 +43,21 @@ class AuthService:
         if flag is False:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="Invalid Credentials")
         return user
+    
+    async def verify_email(self,verify_email:VerifyEmailDTO):
+        try:
+            dbUser = await Users.find_one({"emailVerificationLinkToken":verify_email.token})
+            if dbUser is None:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Invalid Token.")
+            if dbUser["emailVerificationCode"] != verify_email.code:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Code Is Invalid.")
+            dbUser["emailVerificationLinkToken"] = None
+            dbUser["emailVerificationCode"] = None
+            dbUser["isEmailVerified"] = True
+            await Users.update_one({'_id':ObjectId(dbUser['_id'])},{"$set":dbUser},upsert=True)        
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Something Went Wrong")
+
 
 
 authService = AuthService()

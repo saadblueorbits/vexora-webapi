@@ -2,12 +2,15 @@
 
 import time
 
+from bson import ObjectId
 from fastapi import Depends, HTTPException, Request
 from app.config import settings
 import jwt
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
+from app.database import Users
 from app.users.models.user import User
+
 
 # Authentication scheme
 oauth2_scheme = HTTPBearer()
@@ -55,7 +58,12 @@ async def get_current_user(request: Request, token: HTTPAuthorizationCredentials
         if user_id is None:
             raise HTTPException(status_code=400, detail="Could not validate token")
         # user = User(username=username)
-        return user_id
+        dbUser = await Users.find_one({'_id': ObjectId(user_id)} )
+        dbUser['id'] = str(dbUser['_id'])
+        user = User(**dbUser)
+        if user.isEmailVerified is False:
+            raise HTTPException(status_code=401, detail="Please verify your email.")
+        return user
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
     except jwt.InvalidTokenError:

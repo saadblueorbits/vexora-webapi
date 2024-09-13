@@ -3,8 +3,10 @@ from app import oauth2
 from app.auth.dtos.login_user import LoginUserDTO
 from app.auth.dtos.register_user import RegisterUserDTO
 from app.auth.auth_service import authService
+from app.auth.dtos.verify_email import VerifyEmailDTO
 from app.oauth2 import decode_jwt, generate_access_token,generate_refresh_token, refresh_access_token
 from app.config import settings
+from app.users.models.user import User
 
 router = APIRouter()
 
@@ -45,10 +47,15 @@ async def refresh_token(request:Request,response:Response):
         
 
 
-@router.get('/logout', status_code=status.HTTP_200_OK)
-def logout(response: Response, user_id: str = Depends(oauth2.get_current_user)):
+@router.get('/logout')
+def logout(response: Response, user: User = Depends(oauth2.get_current_user)):
     response.set_cookie('logged_in', '', -1)
     response.set_cookie('access_token', '', -1)
     response.set_cookie('refresh_token', '', -1)
 
     return {'status': 'success'}
+
+@router.post('/verifyemail')
+async def verify_email(payload:VerifyEmailDTO):
+    await authService.verify_email(payload)
+    return {'status':'success'}
