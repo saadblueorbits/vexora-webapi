@@ -5,4 +5,4 @@ class User(RegisterUserDTO):
     isEmailVerified: bool = False
     emailVerificationLinkToken: str|None=None
     emailVerificationCode:str|None = None
-    
+    forgotPasswordToken:str|None

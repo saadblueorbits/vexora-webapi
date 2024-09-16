@@ -1,6 +1,8 @@
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response,status
 from app import oauth2
+from app.auth.dtos.forgot_password import ForgotPasswordDTO
 from app.auth.dtos.login_user import LoginUserDTO
+from app.auth.dtos.recover_password import RecoverPasswordDTO
 from app.auth.dtos.register_user import RegisterUserDTO
 from app.auth.auth_service import authService
 from app.auth.dtos.verify_email import VerifyEmailDTO
@@ -58,4 +60,14 @@ def logout(response: Response, user: User = Depends(oauth2.get_current_user)):
 @router.post('/verifyemail')
 async def verify_email(payload:VerifyEmailDTO):
     await authService.verify_email(payload)
+    return {'status':'success'}
+
+@router.post('/forgotpassword')
+async def forgot_password(payload:ForgotPasswordDTO, background_tasks: BackgroundTasks):
+    await authService.forgot_password(payload=payload,background_tasks=background_tasks)
+    return {'status':'success'}
+
+@router.post('/recoverpassword')
+async def recover_password(payload:RecoverPasswordDTO):
+    await authService.recover_password(payload=payload)
     return {'status':'success'}
