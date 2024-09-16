@@ -1,22 +1,20 @@
-FROM python:3.10-slim
+# Base image
+FROM python:3.10-buster
 
-# Set the working directory in the container
+# set work directory
 WORKDIR /app
 
-# Copy the requirements file into the container at /app
-COPY requirements.txt .
+# set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-# Install any dependencies specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# install dependencies
+COPY [ "requirements.txt", "run.sh", "./"]
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt && chmod +x ./run.sh
 
-# Copy the current directory contents into the container at /app
+# copy project
 COPY . .
 
-# Make port 80 available to the world outside this container
-EXPOSE 80
-
-# Define environment variables
-ENV PYTHONUNBUFFERED=1
-
-# Command to run the FastAPI app using uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
+# Set entrypoint
+ENTRYPOINT bash ./run.sh

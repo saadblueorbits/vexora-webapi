@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+from app.celery.worker import create_task
 from fastapi import FastAPI
 from app.auth import auth_controller
 from app.users import users_controller
@@ -18,5 +19,6 @@ app.include_router(router=speaker_controller.router, tags=['Speakers'], prefix='
 
 @app.get("/api/healthchecker")
 def root():
+    task = create_task.delay(int("1"))
     return {"message": "Welcome to FastAPI with MongoDB"}
  

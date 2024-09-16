@@ -13,16 +13,16 @@ services:
       - mongo:/data/db
     ports:
       - '6000:27017'
-  webapi:
-    build:
-      context: .
-      dockerfile: Dockerfile
+
+  web:
+    build: .
     ports:
-      - "8000:80"
-    extra_hosts:
-      - "host.docker.internal:172.17.0.1"
+      - 8001:8000
+      - 5556:5555
     volumes:
       - .:/app
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
     environment:
       - PYTHONUNBUFFERED=1
       - MONGO_INITDB_ROOT_USERNAME=admin
@@ -39,6 +39,21 @@ services:
       - SMTP_PORT=587
       - SMTP_USER=martinjoey2j618@gmail.com
       - SMTP_PASSWORD=rdiczfulcmdqcrhf
+      - CELERY_BROKER_URL=redis://celerybackend:6379/0
+      - CELERY_RESULT_BACKEND=redis://celerybackend:6379/0
+    depends_on:
+      - celerybackend
+
+  celerybackend:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+    restart: always
 
 volumes:
   mongo:

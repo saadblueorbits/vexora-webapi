@@ -13,7 +13,8 @@ class Settings(BaseSettings):
     SMTP_PORT: str
     SMTP_USER: str
     SMTP_PASSWORD: str
-
+    CELERY_BROKER_URL: str
+    CELERY_RESULT_BACKEND:str
     SECRET_KEY: str
     REFRESH_TOKEN_EXPIRES_IN: int
     ACCESS_TOKEN_EXPIRES_IN: int
