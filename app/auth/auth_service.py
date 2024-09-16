@@ -3,6 +3,7 @@ import random
 from bson import ObjectId
 from fastapi import HTTPException,status,BackgroundTasks
 from app import smtp, utils
+from app.auth.dtos.change_password import ChangePasswordDTO
 from app.auth.dtos.forgot_password import ForgotPasswordDTO
 from app.auth.dtos.login_user import LoginUserDTO
 from app.auth.dtos.recover_password import RecoverPasswordDTO
@@ -93,6 +94,16 @@ class AuthService:
             await Users.update_one({'_id':ObjectId(user.id)},{'$set':user.model_dump()},upsert=True)
         except Exception as e:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Something Went Wrong")
+    
+    async def change_password(self,user:User,payload:ChangePasswordDTO):
+        try:
+            flag = utils.verify_password(payload.oldPassword,user.password)
+            if flag is False:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="Old Password Is Wrong.")
+            user.password = utils.hash_password(payload.newPassword)
+            await Users.update_one({'_id':ObjectId(user.id)},{'$set':user.model_dump()},upsert=True)
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Something Went Wrong.")
 
 authService = AuthService()
 

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response,status
 from app import oauth2
+from app.auth.dtos.change_password import ChangePasswordDTO
 from app.auth.dtos.forgot_password import ForgotPasswordDTO
 from app.auth.dtos.login_user import LoginUserDTO
 from app.auth.dtos.recover_password import RecoverPasswordDTO
@@ -70,4 +71,9 @@ async def forgot_password(payload:ForgotPasswordDTO, background_tasks: Backgroun
 @router.post('/recoverpassword')
 async def recover_password(payload:RecoverPasswordDTO):
     await authService.recover_password(payload=payload)
+    return {'status':'success'}
+
+@router.post('/changepassword')
+async def change_password(payload:ChangePasswordDTO,user: User = Depends(oauth2.get_current_user)):
+    await authService.change_password(user,payload=payload)
     return {'status':'success'}
