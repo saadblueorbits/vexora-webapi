@@ -1,4 +1,3 @@
-from contextlib import asynccontextmanager
 from app.celery.worker import create_task
 from fastapi import FastAPI
 from app.auth import auth_controller
