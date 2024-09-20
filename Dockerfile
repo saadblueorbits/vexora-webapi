@@ -17,4 +17,6 @@ RUN pip install --no-cache-dir -r requirements.txt && chmod +x ./run.sh
 COPY . .
 
 # Set entrypoint
-ENTRYPOINT bash ./run.sh
+# ENTRYPOINT bash ./run.sh
+EXPOSE 8000
+CMD ["uvicorn", "app.main:app"]
