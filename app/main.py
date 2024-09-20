@@ -15,7 +15,7 @@ app.include_router(router=auth_controller.router, tags=['Auth'], prefix='/api/au
 app.include_router(router=users_controller.router, tags=['Users'], prefix='/api/users')
 app.include_router(router=speaker_controller.router, tags=['Speakers'], prefix='/api/speakers')
 
-@app.get("/api/")
+@app.get("/")
 def health_check():
     return "running"
 
